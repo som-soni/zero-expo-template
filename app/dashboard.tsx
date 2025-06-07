@@ -2,36 +2,37 @@ import { StyleSheet, ScrollView } from 'react-native';
 
 import { Text, View } from '@/components/ui/Themed';
 import { MainLayout } from '@/components/ui/MainLayout';
+import { commonStyles, spacing, typography } from '@/lib/styles';
 
 export default function DashboardScreen() {
   return (
     <MainLayout>
-      <ScrollView style={styles.container}>
+      <ScrollView style={commonStyles.pageContainer}>
       <View style={styles.header}>
         <Text style={styles.title}>Dashboard</Text>
         <Text style={styles.subtitle}>Welcome to your main dashboard</Text>
       </View>
 
       <View style={styles.grid}>
-        <View style={styles.card}>
+        <View style={[commonStyles.card, styles.dashboardCard]}>
           <Text style={styles.cardTitle}>Total Users</Text>
           <Text style={styles.cardValue}>1,234</Text>
           <Text style={styles.cardChange}>+12% from last month</Text>
         </View>
 
-        <View style={styles.card}>
+        <View style={[commonStyles.card, styles.dashboardCard]}>
           <Text style={styles.cardTitle}>Revenue</Text>
           <Text style={styles.cardValue}>$45,678</Text>
           <Text style={styles.cardChange}>+8% from last month</Text>
         </View>
 
-        <View style={styles.card}>
+        <View style={[commonStyles.card, styles.dashboardCard]}>
           <Text style={styles.cardTitle}>Active Sessions</Text>
           <Text style={styles.cardValue}>567</Text>
           <Text style={styles.cardChange}>-3% from last month</Text>
         </View>
 
-        <View style={styles.card}>
+        <View style={[commonStyles.card, styles.dashboardCard]}>
           <Text style={styles.cardTitle}>Conversion Rate</Text>
           <Text style={styles.cardValue}>3.2%</Text>
           <Text style={styles.cardChange}>+15% from last month</Text>
@@ -59,9 +60,11 @@ export default function DashboardScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  dashboardCard: {
     flex: 1,
-    padding: 20,
+    minWidth: 250,
+    maxWidth: '48%',
+    marginBottom: spacing.lg,
   },
   header: {
     marginBottom: 30,
@@ -82,15 +85,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     gap: 10, // Add consistent spacing
   },
-  card: {
-    flex: 1,
-    minWidth: 250, // Minimum width for responsiveness
-    maxWidth: '48%', // Maximum width to maintain 2-column layout
-    backgroundColor: '#f8f9fa',
-    padding: 20,
-    borderRadius: 12,
-    marginBottom: 15,
-  },
+
   cardTitle: {
     fontSize: 14,
     fontWeight: '600',

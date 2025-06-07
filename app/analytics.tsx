@@ -4,6 +4,7 @@ import { Text, View } from '@/components/ui/Themed';
 import { Colors } from '@/lib/theme';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { MainLayout } from '@/components/ui/MainLayout';
+import { commonStyles } from '@/lib/styles';
 
 export default function AnalyticsScreen() {
   const colorScheme = useColorScheme();
@@ -11,7 +12,7 @@ export default function AnalyticsScreen() {
   
   return (
     <MainLayout>
-      <ScrollView style={styles.container}>
+      <ScrollView style={commonStyles.pageContainer}>
       <View style={styles.header}>
         <Text style={styles.title}>Analytics</Text>
         <Text style={styles.subtitle}>Performance metrics and insights</Text>
@@ -69,10 +70,6 @@ export default function AnalyticsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-  },
   header: {
     marginBottom: 30,
   },

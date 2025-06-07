@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/lib/theme';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { MainLayout } from '@/components/ui/MainLayout';
+import { commonStyles } from '@/lib/styles';
 
 interface SettingItemProps {
   icon: React.ComponentProps<typeof Ionicons>['name'];
@@ -41,7 +42,7 @@ export default function SettingsScreen() {
 
   return (
     <MainLayout>
-      <ScrollView style={styles.container}>
+      <ScrollView style={commonStyles.pageContainer}>
       <View style={styles.header}>
         <Text style={styles.title}>Settings</Text>
         <Text style={styles.subtitle}>Configure your app preferences</Text>
@@ -114,11 +115,7 @@ export default function SettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   header: {
-    padding: 20,
     marginBottom: 10,
   },
   title: {
@@ -136,12 +133,10 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    paddingHorizontal: 20,
     marginBottom: 10,
     opacity: 0.8,
   },
   sectionContent: {
-    marginHorizontal: 20,
     borderRadius: 12,
     overflow: 'hidden',
   },
