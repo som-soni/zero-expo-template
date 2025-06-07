@@ -3,13 +3,15 @@ import { StyleSheet, ScrollView } from 'react-native';
 import { Text, View } from '@/components/ui/Themed';
 import { Colors } from '@/lib/theme';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { MainLayout } from '@/components/ui/MainLayout';
 
-export default function TabTwoScreen() {
+export default function AnalyticsScreen() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
   
   return (
-    <ScrollView style={styles.container}>
+    <MainLayout>
+      <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Analytics</Text>
         <Text style={styles.subtitle}>Performance metrics and insights</Text>
@@ -62,6 +64,7 @@ export default function TabTwoScreen() {
         </View>
       </View>
     </ScrollView>
+    </MainLayout>
   );
 }
 

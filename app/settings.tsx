@@ -4,6 +4,7 @@ import { Text, View } from '@/components/ui/Themed';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/lib/theme';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { MainLayout } from '@/components/ui/MainLayout';
 
 interface SettingItemProps {
   icon: React.ComponentProps<typeof Ionicons>['name'];
@@ -39,7 +40,8 @@ export default function SettingsScreen() {
   );
 
   return (
-    <ScrollView style={styles.container}>
+    <MainLayout>
+      <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Settings</Text>
         <Text style={styles.subtitle}>Configure your app preferences</Text>
@@ -107,6 +109,7 @@ export default function SettingsScreen() {
         </View>
       </View>
     </ScrollView>
+    </MainLayout>
   );
 }
 
