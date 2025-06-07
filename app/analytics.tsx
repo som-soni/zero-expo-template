@@ -1,11 +1,17 @@
 import { StyleSheet, ScrollView } from 'react-native';
 
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
+import { Text, View } from '@/components/ui/Themed';
+import { Colors } from '@/lib/theme';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { MainLayout } from '@/components/ui/MainLayout';
 
-export default function TabTwoScreen() {
+export default function AnalyticsScreen() {
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? 'light'];
+  
   return (
-    <ScrollView style={styles.container}>
+    <MainLayout>
+      <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Analytics</Text>
         <Text style={styles.subtitle}>Performance metrics and insights</Text>
@@ -13,26 +19,26 @@ export default function TabTwoScreen() {
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Traffic Overview</Text>
-        <View style={styles.chartPlaceholder}>
+        <View style={[styles.chartPlaceholder, { backgroundColor: colors.surface, borderColor: colors.gray200 }]}>
           <Text style={styles.chartText}>📊 Chart Placeholder</Text>
           <Text style={styles.chartSubtext}>Weekly traffic visualization would go here</Text>
         </View>
       </View>
 
       <View style={styles.metricsGrid}>
-        <View style={styles.metric}>
+        <View style={[styles.metric, { backgroundColor: colors.surface }]}>
           <Text style={styles.metricValue}>85%</Text>
           <Text style={styles.metricLabel}>Bounce Rate</Text>
         </View>
-        <View style={styles.metric}>
+        <View style={[styles.metric, { backgroundColor: colors.surface }]}>
           <Text style={styles.metricValue}>2.4s</Text>
           <Text style={styles.metricLabel}>Avg Load Time</Text>
         </View>
-        <View style={styles.metric}>
+        <View style={[styles.metric, { backgroundColor: colors.surface }]}>
           <Text style={styles.metricValue}>4.2</Text>
           <Text style={styles.metricLabel}>Pages per Session</Text>
         </View>
-        <View style={styles.metric}>
+        <View style={[styles.metric, { backgroundColor: colors.surface }]}>
           <Text style={styles.metricValue}>67%</Text>
           <Text style={styles.metricLabel}>Mobile Traffic</Text>
         </View>
@@ -40,24 +46,25 @@ export default function TabTwoScreen() {
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Top Pages</Text>
-        <View style={styles.pageItem}>
+        <View style={[styles.pageItem, { backgroundColor: colors.surface }]}>
           <Text style={styles.pageName}>/dashboard</Text>
           <Text style={styles.pageViews}>1,234 views</Text>
         </View>
-        <View style={styles.pageItem}>
+        <View style={[styles.pageItem, { backgroundColor: colors.surface }]}>
           <Text style={styles.pageName}>/analytics</Text>
           <Text style={styles.pageViews}>987 views</Text>
         </View>
-        <View style={styles.pageItem}>
+        <View style={[styles.pageItem, { backgroundColor: colors.surface }]}>
           <Text style={styles.pageName}>/settings</Text>
           <Text style={styles.pageViews}>654 views</Text>
         </View>
-        <View style={styles.pageItem}>
+        <View style={[styles.pageItem, { backgroundColor: colors.surface }]}>
           <Text style={styles.pageName}>/users</Text>
           <Text style={styles.pageViews}>321 views</Text>
         </View>
       </View>
     </ScrollView>
+    </MainLayout>
   );
 }
 
@@ -88,13 +95,11 @@ const styles = StyleSheet.create({
   },
   chartPlaceholder: {
     height: 200,
-    backgroundColor: '#f8f9fa',
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
     borderStyle: 'dashed',
-    borderColor: '#d1d5db',
   },
   chartText: {
     fontSize: 24,
@@ -112,7 +117,6 @@ const styles = StyleSheet.create({
   },
   metric: {
     width: '48%',
-    backgroundColor: '#f8f9fa',
     padding: 20,
     borderRadius: 12,
     alignItems: 'center',
@@ -133,7 +137,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 15,
-    backgroundColor: '#f8f9fa',
     borderRadius: 8,
     marginBottom: 10,
   },

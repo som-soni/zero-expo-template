@@ -1,11 +1,12 @@
 import { StyleSheet, ScrollView } from 'react-native';
 
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
+import { Text, View } from '@/components/ui/Themed';
+import { MainLayout } from '@/components/ui/MainLayout';
 
-export default function TabOneScreen() {
+export default function DashboardScreen() {
   return (
-    <ScrollView style={styles.container}>
+    <MainLayout>
+      <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Dashboard</Text>
         <Text style={styles.subtitle}>Welcome to your main dashboard</Text>
@@ -53,6 +54,7 @@ export default function TabOneScreen() {
         </View>
       </View>
     </ScrollView>
+    </MainLayout>
   );
 }
 
@@ -78,9 +80,12 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     marginBottom: 30,
+    gap: 10, // Add consistent spacing
   },
   card: {
-    width: '48%',
+    flex: 1,
+    minWidth: 250, // Minimum width for responsiveness
+    maxWidth: '48%', // Maximum width to maintain 2-column layout
     backgroundColor: '#f8f9fa',
     padding: 20,
     borderRadius: 12,

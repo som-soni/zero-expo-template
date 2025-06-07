@@ -1,18 +1,32 @@
 import React, { useState } from 'react';
 import { StyleSheet, ScrollView, Switch, TouchableOpacity } from 'react-native';
-import { Text, View } from '@/components/Themed';
+import { Text, View } from '@/components/ui/Themed';
 import { Ionicons } from '@expo/vector-icons';
+import { Colors } from '@/lib/theme';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { MainLayout } from '@/components/ui/MainLayout';
+
+interface SettingItemProps {
+  icon: React.ComponentProps<typeof Ionicons>['name'];
+  title: string;
+  subtitle?: string;
+  onPress?: () => void;
+  showArrow?: boolean;
+  rightElement?: React.ReactNode;
+}
 
 export default function SettingsScreen() {
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? 'light'];
+  
   const [pushNotifications, setPushNotifications] = useState(true);
-  const [emailNotifications, setEmailNotifications] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [autoSync, setAutoSync] = useState(true);
 
-  const SettingItem = ({ icon, title, subtitle, onPress, showArrow = true, rightElement }: any) => (
-    <TouchableOpacity style={styles.settingItem} onPress={onPress}>
+  const SettingItem = ({ icon, title, subtitle, onPress, showArrow = true, rightElement }: SettingItemProps) => (
+    <TouchableOpacity style={[styles.settingItem, { backgroundColor: colors.background, borderBottomColor: colors.border }]} onPress={onPress}>
       <View style={styles.settingLeft}>
-        <Ionicons name={icon} size={24} color="#6b7280" style={styles.settingIcon} />
+        <Ionicons name={icon} size={24} color={colors.gray500} style={styles.settingIcon} />
         <View>
           <Text style={styles.settingTitle}>{title}</Text>
           {subtitle && <Text style={styles.settingSubtitle}>{subtitle}</Text>}
@@ -20,78 +34,23 @@ export default function SettingsScreen() {
       </View>
       <View style={styles.settingRight}>
         {rightElement}
-        {showArrow && <Ionicons name="chevron-forward" size={20} color="#6b7280" />}
+        {showArrow && <Ionicons name="chevron-forward" size={20} color={colors.gray500} />}
       </View>
     </TouchableOpacity>
   );
 
   return (
-    <ScrollView style={styles.container}>
+    <MainLayout>
+      <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Settings</Text>
         <Text style={styles.subtitle}>Configure your app preferences</Text>
       </View>
 
-      {/* Account Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Account</Text>
-        <View style={styles.sectionContent}>
-          <SettingItem
-            icon="person-outline"
-            title="Profile"
-            subtitle="Manage your personal information"
-            onPress={() => {}}
-          />
-          <SettingItem
-            icon="key-outline"
-            title="Privacy & Security"
-            subtitle="Password, 2FA, privacy settings"
-            onPress={() => {}}
-          />
-          <SettingItem
-            icon="card-outline"
-            title="Billing & Subscription"
-            subtitle="Manage your subscription and billing"
-            onPress={() => {}}
-          />
-        </View>
-      </View>
-
-      {/* Notifications Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Notifications</Text>
-        <View style={styles.sectionContent}>
-          <SettingItem
-            icon="notifications-outline"
-            title="Push Notifications"
-            subtitle="Receive notifications on this device"
-            showArrow={false}
-            rightElement={
-              <Switch
-                value={pushNotifications}
-                onValueChange={setPushNotifications}
-              />
-            }
-          />
-          <SettingItem
-            icon="mail-outline"
-            title="Email Notifications"
-            subtitle="Receive notifications via email"
-            showArrow={false}
-            rightElement={
-              <Switch
-                value={emailNotifications}
-                onValueChange={setEmailNotifications}
-              />
-            }
-          />
-        </View>
-      </View>
-
       {/* Preferences Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Preferences</Text>
-        <View style={styles.sectionContent}>
+        <View style={[styles.sectionContent, { backgroundColor: colors.surface }]}>
           <SettingItem
             icon="moon-outline"
             title="Dark Mode"
@@ -101,6 +60,18 @@ export default function SettingsScreen() {
               <Switch
                 value={darkMode}
                 onValueChange={setDarkMode}
+              />
+            }
+          />
+          <SettingItem
+            icon="notifications-outline"
+            title="Push Notifications"
+            subtitle="Receive notifications on this device"
+            showArrow={false}
+            rightElement={
+              <Switch
+                value={pushNotifications}
+                onValueChange={setPushNotifications}
               />
             }
           />
@@ -116,19 +87,13 @@ export default function SettingsScreen() {
               />
             }
           />
-          <SettingItem
-            icon="language-outline"
-            title="Language"
-            subtitle="English (US)"
-            onPress={() => {}}
-          />
         </View>
       </View>
 
       {/* Support Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Support</Text>
-        <View style={styles.sectionContent}>
+        <View style={[styles.sectionContent, { backgroundColor: colors.surface }]}>
           <SettingItem
             icon="help-circle-outline"
             title="Help Center"
@@ -136,20 +101,15 @@ export default function SettingsScreen() {
             onPress={() => {}}
           />
           <SettingItem
-            icon="chatbubble-outline"
-            title="Contact Us"
-            subtitle="Send feedback or report issues"
-            onPress={() => {}}
-          />
-          <SettingItem
             icon="document-text-outline"
-            title="Terms & Privacy"
-            subtitle="Legal information"
+            title="About"
+            subtitle="App version and legal information"
             onPress={() => {}}
           />
         </View>
       </View>
     </ScrollView>
+    </MainLayout>
   );
 }
 
@@ -181,7 +141,6 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   sectionContent: {
-    backgroundColor: '#f8f9fa',
     marginHorizontal: 20,
     borderRadius: 12,
     overflow: 'hidden',
@@ -191,9 +150,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 15,
-    backgroundColor: 'white',
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
   },
   settingLeft: {
     flexDirection: 'row',
@@ -201,7 +158,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   settingIcon: {
-    marginRight: 15,
+    marginRight: 12,
   },
   settingTitle: {
     fontSize: 16,
