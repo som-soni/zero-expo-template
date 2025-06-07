@@ -204,4 +204,118 @@ export const sidebarStyles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
   },
+});
+
+// Chat-specific styles
+export const chatStyles = StyleSheet.create({
+  // Centered layout with responsive margins (75% content width)
+  centeredContainer: {
+    flex: 1,
+    paddingTop: spacing.xl,
+  },
+  
+  // Chat messages container
+  messagesContainer: {
+    flex: 1,
+    paddingBottom: spacing.md,
+  },
+  
+  // Message bubble base style
+  messageBubble: {
+    maxWidth: '80%',
+    padding: spacing.lg,
+    borderRadius: 18,
+    marginBottom: spacing.md,
+  },
+  
+  // User message (right aligned)
+  userBubble: {
+    alignSelf: 'flex-end',
+    backgroundColor: '#e0f0ff',
+  },
+  
+  // AI message (left aligned)
+  aiBubble: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#F2F2F7',
+  },
+  
+  // Message text styles
+  userMessageText: {
+    color: '#1a1a1a',
+    fontSize: 16,
+    lineHeight: 22,
+  },
+  
+  aiMessageText: {
+    color: '#000000',
+    fontSize: 16,
+    lineHeight: 22,
+  },
+  
+  // Input container at bottom
+  inputContainer: {
+    // paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    backgroundColor: 'transparent',
+  },
+  
+  // Text input wrapper (now contains both input and send button)
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    backgroundColor: '#F2F2F7',
+    borderRadius: 24,
+    paddingLeft: spacing.lg,
+    paddingRight: spacing.sm,
+    paddingVertical: spacing.md,
+  },
+  
+  // Text input field
+  textInput: {
+    flex: 1,
+    fontSize: 16,
+    lineHeight: 22,
+    maxHeight: 120, // Limit max height for growth
+    minHeight: 22,
+          marginRight: spacing.sm,
+      ...(Platform.OS === 'web' ? {
+        outlineWidth: 0,
+        outlineColor: 'transparent',
+      } : {}),
+  },
+  
+  // Send button (now inside input wrapper)
+  sendButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#007AFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'flex-end',
+    marginBottom: 2, // Slight adjustment for visual alignment
+  },
+  
+  // Empty state
+  emptyState: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.xl,
+  },
+  
+  emptyStateText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#8E8E93',
+    textAlign: 'center',
+    marginBottom: spacing.sm,
+  },
+  
+  emptyStateSubtext: {
+    fontSize: 16,
+    color: '#C7C7CC',
+    textAlign: 'center',
+  },
 }); 

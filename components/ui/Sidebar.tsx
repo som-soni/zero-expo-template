@@ -48,6 +48,12 @@ export function Sidebar({ isOpen, onClose, isCollapsed: externalIsCollapsed, onT
   // Navigation items based on current tab structure
   const navigationItems: NavigationItem[] = [
     {
+      label: 'New Chat',
+      icon: 'chatbubble-outline',
+      route: '/chat',
+      focused: pathname === '/chat',
+    },
+    {
       label: 'Dashboard',
       icon: 'home-outline',
       route: '/dashboard',
