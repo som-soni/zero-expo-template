@@ -72,11 +72,11 @@ export function MainLayout({ children }: MainLayoutProps) {
         ]}
       >
         {/* Header with Menu Button */}
-        {(!isDesktop || isSidebarCollapsed) && (
+        {(!isDesktop ) && (
           <View style={[styles.header, { borderBottomColor: colors.border }]}>
             <TouchableOpacity 
               style={styles.menuButton} 
-              onPress={isDesktop ? () => setIsSidebarCollapsed(false) : toggleSidebar}
+              onPress={toggleSidebar}
             >
               <Ionicons name="menu" size={24} color={colors.text} />
             </TouchableOpacity>

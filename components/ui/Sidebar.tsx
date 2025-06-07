@@ -147,11 +147,7 @@ export function Sidebar({ isOpen, onClose, isCollapsed: externalIsCollapsed, onT
               style={styles.collapseButton}
               onPress={toggleCollapse}
             >
-              <Ionicons
-                name={'menu' }
-                size={20}
-                color={colors.gray500}
-              />
+             <Ionicons name="menu" size={24} color={colors.text} />
             </TouchableOpacity>
           {/* )} */}
           {!isCollapsed && (
