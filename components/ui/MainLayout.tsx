@@ -10,6 +10,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Colors } from '@/lib/theme';
+import { layout } from '@/lib/styles';
 import { Sidebar } from './Sidebar';
 
 interface MainLayoutProps {
@@ -48,9 +49,8 @@ export function MainLayout({ children }: MainLayoutProps) {
   };
 
   // Calculate content margin based on sidebar state
-  const sidebarWidth = 280;
-  const collapsedSidebarWidth = 70;
-  const contentMarginLeft = isDesktop && isSidebarOpen ? (isSidebarCollapsed ? collapsedSidebarWidth : sidebarWidth) : 0;
+  const contentMarginLeft = isDesktop && isSidebarOpen ? 
+    (isSidebarCollapsed ? layout.sidebar.collapsedWidth : layout.sidebar.width) : 0;
 
   return (
     <View style={styles.container}>

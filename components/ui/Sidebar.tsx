@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter, usePathname } from 'expo-router';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Colors } from '@/lib/theme';
+import { commonStyles, sidebarStyles, spacing, layout } from '@/lib/styles';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -110,7 +111,7 @@ export function Sidebar({ isOpen, onClose, isCollapsed: externalIsCollapsed, onT
     }
   }, [isLargeScreen, onToggleCollapse, externalIsCollapsed]);
 
-  const sidebarWidth = isCollapsed ? 70 : 280;
+  const sidebarWidth = isCollapsed ? layout.sidebar.collapsedWidth : layout.sidebar.width;
 
   if (!isOpen && !isDesktop) {
     return null;
@@ -136,20 +137,17 @@ export function Sidebar({ isOpen, onClose, isCollapsed: externalIsCollapsed, onT
             backgroundColor: colors.background,
             borderRightColor: colors.border,
           },
-          // !isDesktop && !isOpen && styles.hiddenSidebar,
+          !isDesktop && !isOpen && styles.hiddenSidebar,
         ]}
       >
         {/* Header */}
         <View style={styles.header}>
-          
-          {/* {isDesktop && ( */}
-            <TouchableOpacity
-              style={styles.collapseButton}
-              onPress={toggleCollapse}
-            >
-             <Ionicons name="menu" size={24} color={colors.text} />
-            </TouchableOpacity>
-          {/* )} */}
+          <TouchableOpacity
+            style={styles.collapseButton}
+            onPress={toggleCollapse}
+          >
+            <Ionicons name="menu" size={24} color={colors.text} />
+          </TouchableOpacity>
           {!isCollapsed && (
             <Text style={[styles.appTitle, { color: colors.text }]}>
               My App
@@ -163,11 +161,11 @@ export function Sidebar({ isOpen, onClose, isCollapsed: externalIsCollapsed, onT
             <TouchableOpacity
               key={item.route}
               style={[
-                styles.navItem,
+                sidebarStyles.navItem,
                 item.focused && {
                   backgroundColor: colors.tint + '15',
                 },
-                isCollapsed && styles.navItemCollapsed,
+                isCollapsed && sidebarStyles.navItemCollapsed,
               ]}
               onPress={() => handleNavigation(item.route)}
             >
@@ -190,12 +188,25 @@ export function Sidebar({ isOpen, onClose, isCollapsed: externalIsCollapsed, onT
           ))}
         </ScrollView>
 
-        {/* User Info - Moved to bottom */}
-        <View style={styles.userSection}>
-          <View style={[styles.avatar, { backgroundColor: colors.tint }]}>
-            <Text style={styles.avatarText}>JD</Text>
+        {/* User Info with Logout - Responsive layout */}
+        {isCollapsed ? (
+          <View style={styles.collapsedUserSection}>
+            <TouchableOpacity
+              style={[sidebarStyles.avatar, { backgroundColor: colors.tint }]}
+              onPress={handleLogout}
+            >
+              <Ionicons
+                name="log-out-outline"
+                size={20}
+                color="white"
+              />
+            </TouchableOpacity>
           </View>
-          {!isCollapsed && (
+        ) : (
+          <View style={sidebarStyles.userSection}>
+            <View style={[sidebarStyles.avatar, { backgroundColor: colors.tint }]}>
+              <Text style={styles.avatarText}>JD</Text>
+            </View>
             <View style={styles.userInfo}>
               <Text style={[styles.userName, { color: colors.text }]}>
                 John Doe
@@ -203,31 +214,19 @@ export function Sidebar({ isOpen, onClose, isCollapsed: externalIsCollapsed, onT
               <Text style={[styles.userEmail, { color: colors.gray500 }]}>
                 john@example.com
               </Text>
-            
-              <TouchableOpacity
-            style={[styles.logoutButton, isCollapsed && styles.navItemCollapsed]}
-            onPress={handleLogout}
-          >
-            <Ionicons
-              name="log-out-outline"
-              size={22}
-              color={colors.gray500}
-            />
-            {/* {!isCollapsed && (
-              <Text style={[styles.logoutText, { color: colors.gray500 }]}>
-                Logout
-              </Text>
-            )} */}
-          </TouchableOpacity>
             </View>
-            
-          )}
-        </View>
-
-        {/* Logout Button */}
-        <View style={styles.footer}>
-         
-        </View>
+            <TouchableOpacity
+              style={sidebarStyles.iconButton}
+              onPress={handleLogout}
+            >
+              <Ionicons
+                name="log-out-outline"
+                size={22}
+                color={colors.gray500}
+              />
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </>
   );
@@ -257,31 +256,22 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.1)',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    gap: 12,
   },
   appTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    justifyContent: 'flex-end',
+    flex: 1,
   },
   collapseButton: {
     padding: 4,
-  },
-  userSection: {
-    padding: 20,
-    flexDirection: 'row',
     alignItems: 'center',
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(0,0,0,0.1)',
+    justifyContent: 'center',
   },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+  collapsedUserSection: {
+    padding: 15,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -307,40 +297,11 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 10,
   },
-  navItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    marginHorizontal: 10,
-    borderRadius: 8,
-  },
-  navItemCollapsed: {
-    paddingHorizontal: 25,
-    justifyContent: 'center',
-  },
+
   navLabel: {
     fontSize: 16,
     marginLeft: 12,
     fontWeight: '500',
   },
-  footer: {
-    padding: 10,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(0,0,0,0.1)',
-  },
-  logoutButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    marginHorizontal: 10,
-    borderRadius: 8,
-  },
-  logoutText: {
-    fontSize: 16,
-    marginLeft: 12,
-    fontWeight: '500',
-  },
+
 }); 
