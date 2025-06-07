@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createContext, useContext } from 'react';
+import React, { useState, useEffect, createContext, useContext, useMemo, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, useWindowDimensions, Platform, Alert } from 'react-native';
 import { Drawer } from 'expo-router/drawer';
 import { DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
@@ -7,60 +7,170 @@ import { useRouter, usePathname } from 'expo-router';
 import { useColorScheme } from '@/components/useColorScheme';
 import Colors from '@/constants/Colors';
 
-// Context for sidebar state management
-const SidebarContext = createContext<{
+// Types for better type safety
+interface NavigationItem {
+  label: string;
+  icon: string;
+  route: string;
+  focused: boolean;
+}
+
+interface SidebarContextType {
   isCollapsed: boolean;
   setIsCollapsed: (collapsed: boolean) => void;
   isLargeScreen: boolean;
-}>({
+}
+
+interface CustomDrawerContentProps {
+  navigation: any;
+  state: any;
+  descriptors: any;
+}
+
+// Constants for breakpoints
+const BREAKPOINTS = {
+  LARGE: 1024,
+  MEDIUM: 768,
+} as const;
+
+// Context for sidebar state management
+const SidebarContext = createContext<SidebarContextType>({
   isCollapsed: true,
   setIsCollapsed: () => {},
   isLargeScreen: true,
 });
 
-export const useSidebar = () => useContext(SidebarContext);
+export const useSidebar = () => {
+  const context = useContext(SidebarContext);
+  if (!context) {
+    throw new Error('useSidebar must be used within a SidebarContext.Provider');
+  }
+  return context;
+};
+
+// Custom hook for responsive breakpoints
+const useResponsive = () => {
+  const { width } = useWindowDimensions();
+  
+  return useMemo(() => ({
+    isLargeScreen: width >= BREAKPOINTS.LARGE,
+    isMediumScreen: width >= BREAKPOINTS.MEDIUM,
+    isSmallScreen: width < BREAKPOINTS.MEDIUM,
+  }), [width]);
+};
+
+// Custom hook for navigation items
+const useNavigationItems = (pathname: string): { mainItems: NavigationItem[]; settingsItems: NavigationItem[] } => {
+  return useMemo(() => ({
+    mainItems: [
+      {
+        label: 'Dashboard',
+        icon: 'grid-outline',
+        route: '/(drawer)/(tabs)',
+        focused: pathname.startsWith('/(drawer)/(tabs)') || pathname === '/(drawer)',
+      },
+    ],
+    settingsItems: [
+      {
+        label: 'Settings',
+        icon: 'settings-outline',
+        route: '/(drawer)/settings',
+        focused: pathname === '/(drawer)/settings',
+      },
+      {
+        label: 'Help & Support',
+        icon: 'help-circle-outline',
+        route: '/(drawer)/help',
+        focused: pathname === '/(drawer)/help',
+      },
+    ],
+  }), [pathname]);
+};
+
+// Memoized drawer item component for better performance
+const DrawerItemMemo = React.memo<{
+  item: NavigationItem;
+  isCollapsed: boolean;
+  isLargeScreen: boolean;
+  colors: any;
+  onPress: (route: string) => void;
+}>(({ item, isCollapsed, isLargeScreen, colors, onPress }) => {
+  const handlePress = useCallback(() => onPress(item.route), [item.route, onPress]);
+
+  if (isCollapsed && isLargeScreen) {
+    return (
+      <TouchableOpacity
+        style={[
+          styles.collapsedDrawerItem,
+          {
+            backgroundColor: item.focused 
+              ? colors.tint + '20' 
+              : 'transparent'
+          }
+        ]}
+        {...(Platform.OS === 'web' && { 
+          className: 'collapsed-drawer-item-hover',
+          accessibilityRole: 'button',
+          accessibilityLabel: item.label
+        })}
+        onPress={handlePress}
+        accessible={true}
+        accessibilityLabel={item.label}
+      >
+        <Ionicons
+          name={item.icon as any}
+          size={20}
+          color={item.focused ? colors.tint : colors.tabIconDefault}
+        />
+      </TouchableOpacity>
+    );
+  }
+
+  return (
+    <View style={styles.drawerItem} {...(Platform.OS === 'web' && { className: 'drawer-item-hover' })}>
+      <DrawerItem
+        label={item.label}
+        onPress={handlePress}
+        focused={item.focused}
+        icon={({ color, size, focused }) => (
+          <Ionicons
+            name={item.icon as any}
+            size={18}
+            color={focused ? colors.tint : color}
+          />
+        )}
+        activeTintColor={colors.tint}
+        inactiveTintColor={colors.tabIconDefault}
+        activeBackgroundColor={colors.tint + '12'}
+        style={{ borderRadius: 6 }}
+      />
+    </View>
+  );
+});
+
+DrawerItemMemo.displayName = 'DrawerItemMemo';
 
 // Custom drawer content component
-function CustomDrawerContent(props: any) {
+function CustomDrawerContent(props: CustomDrawerContentProps) {
   const router = useRouter();
   const pathname = usePathname();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
-  const { width } = useWindowDimensions();
-  
-  // Responsive breakpoints
-  const isLargeScreen = width >= 1024;
-  const isMediumScreen = width >= 768;
+  const { isLargeScreen, isMediumScreen } = useResponsive();
   
   // Get collapsed state from context
   const { isCollapsed, setIsCollapsed } = useSidebar();
+  
+  // Get navigation items
+  const { mainItems, settingsItems } = useNavigationItems(pathname);
 
-  // Navigation items grouped by sections
-  const mainItems = [
-    {
-      label: 'Dashboard',
-      icon: 'grid-outline',
-      route: '/(drawer)/(tabs)',
-      focused: pathname.startsWith('/(drawer)/(tabs)') || pathname === '/(drawer)',
-    },
-  ];
+  // Memoized navigation handler
+  const handleNavigation = useCallback((route: string) => {
+    router.push(route);
+  }, [router]);
 
-  const settingsItems = [
-    {
-      label: 'Settings',
-      icon: 'settings-outline',
-      route: '/(drawer)/settings',
-      focused: pathname === '/(drawer)/settings',
-    },
-    {
-      label: 'Help & Support',
-      icon: 'help-circle-outline',
-      route: '/(drawer)/help',
-      focused: pathname === '/(drawer)/help',
-    },
-  ];
-
-  const handleSignOut = () => {
+  // Memoized sign out handler
+  const handleSignOut = useCallback(() => {
     Alert.alert(
       'Sign Out',
       'Are you sure you want to sign out?',
@@ -74,14 +184,50 @@ function CustomDrawerContent(props: any) {
           style: 'destructive',
           onPress: () => {
             console.log('User signed out');
-            // router.replace('/login'); // Uncomment when you have auth
+            // Add your sign out logic here
+            // router.replace('/login');
           },
         },
       ]
     );
-  };
+  }, []);
 
-  const styles = StyleSheet.create({
+  // Memoized collapse handlers
+  const handleCollapse = useCallback(() => setIsCollapsed(true), [setIsCollapsed]);
+  const handleExpand = useCallback(() => setIsCollapsed(false), [setIsCollapsed]);
+
+  // Add web-specific hover styles - moved to useEffect for better organization
+  useEffect(() => {
+    if (Platform.OS !== 'web' || typeof document === 'undefined') return;
+
+    const styleId = 'drawer-hover-styles';
+    if (document.getElementById(styleId)) return;
+
+    const style = document.createElement('style');
+    style.id = styleId;
+    style.textContent = `
+      .drawer-item-hover:hover {
+        background-color: rgba(128, 128, 128, 0.1) !important;
+        transition: background-color 0.2s ease;
+      }
+      .collapsed-drawer-item-hover:hover {
+        background-color: rgba(128, 128, 128, 0.1) !important;
+        transition: background-color 0.2s ease;
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Cleanup function
+    return () => {
+      const existingStyle = document.getElementById(styleId);
+      if (existingStyle) {
+        existingStyle.remove();
+      }
+    };
+  }, []);
+
+  // Memoized styles for better performance
+  const dynamicStyles = useMemo(() => StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: colors.background,
@@ -103,12 +249,6 @@ function CustomDrawerContent(props: any) {
       fontWeight: 'bold',
       marginTop: 4,
     },
-    headerSubtitle: {
-      color: 'white',
-      fontSize: 12,
-      opacity: 0.8,
-      marginTop: 2,
-    },
     collapseButton: {
       padding: 8,
       borderRadius: 6,
@@ -125,11 +265,6 @@ function CustomDrawerContent(props: any) {
       paddingVertical: 8,
       textTransform: 'uppercase',
       letterSpacing: 1,
-    },
-    drawerItem: {
-      marginVertical: 1,
-      marginHorizontal: 8,
-      borderRadius: 6,
     },
     footer: {
       borderTopWidth: 1,
@@ -181,96 +316,68 @@ function CustomDrawerContent(props: any) {
       marginTop: 12,
       alignItems: 'center',
     },
-    collapsedDrawerItem: {
-      width: 44,
-      height: 44,
-      borderRadius: 8,
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginVertical: 4,
-      marginHorizontal: 8,
-    },
     collapsedFooter: {
       alignItems: 'center',
       paddingBottom: 16,
       paddingHorizontal: 8,
     },
-  });
+  }), [colors, isCollapsed]);
 
-  const renderDrawerItem = (item: any) => {
-    if (isCollapsed && isLargeScreen) {
-      return (
-        <TouchableOpacity
-          key={item.route}
-          style={[
-            styles.collapsedDrawerItem,
-            {
-              backgroundColor: item.focused 
-                ? colors.tint + '20' 
-                : 'transparent'
-            }
-          ]}
-          onPress={() => router.push(item.route)}
-        >
-          <Ionicons
-            name={item.icon as any}
-            size={20}
-            color={item.focused ? colors.tint : colors.tabIconDefault}
-          />
-        </TouchableOpacity>
-      );
-    }
-
-    return (
-      <View key={item.route} style={styles.drawerItem}>
-        <DrawerItem
-          label={item.label}
-          onPress={() => router.push(item.route)}
-          focused={item.focused}
-          icon={({ color, size, focused }) => (
-            <Ionicons
-              name={item.icon as any}
-              size={18}
-              color={focused ? colors.tint : color}
-            />
-          )}
-          activeTintColor={colors.tint}
-          inactiveTintColor={colors.tabIconDefault}
-          activeBackgroundColor={colors.tint + '12'}
-          style={{ borderRadius: 6 }}
-        />
-      </View>
-    );
-  };
-
+  // Collapsed view
   if (isCollapsed && isLargeScreen) {
     return (
-      <View style={[styles.container, styles.collapsedContainer]}>
+      <View style={[dynamicStyles.container, dynamicStyles.collapsedContainer]}>
         {/* Collapsed Header */}
-        <View style={styles.collapsedHeader}>
+        <View style={dynamicStyles.collapsedHeader}>
           <TouchableOpacity
-            style={styles.collapseButton}
-            onPress={() => setIsCollapsed(false)}
+            style={dynamicStyles.collapseButton}
+            onPress={handleExpand}
+            accessible={true}
+            accessibilityLabel="Expand sidebar"
+            accessibilityRole="button"
           >
             <Ionicons name="menu-outline" size={18} color="white" />
           </TouchableOpacity>
         </View>
 
         {/* Main Navigation */}
-        <View style={styles.collapsedSection}>
-          {mainItems.map(renderDrawerItem)}
+        <View style={dynamicStyles.collapsedSection}>
+          {mainItems.map(item => (
+            <DrawerItemMemo
+              key={item.route}
+              item={item}
+              isCollapsed={isCollapsed}
+              isLargeScreen={isLargeScreen}
+              colors={colors}
+              onPress={handleNavigation}
+            />
+          ))}
         </View>
 
         {/* Settings & Support */}
-        <View style={styles.collapsedSection}>
-          {settingsItems.map(renderDrawerItem)}
+        <View style={dynamicStyles.collapsedSection}>
+          {settingsItems.map(item => (
+            <DrawerItemMemo
+              key={item.route}
+              item={item}
+              isCollapsed={isCollapsed}
+              isLargeScreen={isLargeScreen}
+              colors={colors}
+              onPress={handleNavigation}
+            />
+          ))}
         </View>
 
         {/* Collapsed Footer */}
         <View style={{ flex: 1 }} />
-        <View style={styles.collapsedFooter}>
-          <TouchableOpacity onPress={handleSignOut}>
-            <View style={styles.avatar}>
+        <View style={dynamicStyles.collapsedFooter}>
+          <TouchableOpacity 
+            onPress={handleSignOut}
+            accessible={true}
+            accessibilityLabel="User menu - John Doe"
+            accessibilityRole="button"
+          >
+            <View style={dynamicStyles.avatar}>
               <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 12 }}>JD</Text>
             </View>
           </TouchableOpacity>
@@ -279,20 +386,23 @@ function CustomDrawerContent(props: any) {
     );
   }
 
+  // Expanded view
   return (
-    <View style={styles.container}>
+    <View style={dynamicStyles.container}>
       <DrawerContentScrollView {...props} contentContainerStyle={{ paddingTop: 0 }}>
         {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.headerContent}>
+        <View style={dynamicStyles.header}>
+          <View style={dynamicStyles.headerContent}>
             <Ionicons name="apps" size={20} color="white" />
-            <Text style={styles.headerTitle}>My Dashboard</Text>
-            <Text style={styles.headerSubtitle}>Welcome back, John!</Text>
+            <Text style={dynamicStyles.headerTitle}>MyWebsite</Text>
           </View>
           {isLargeScreen && (
             <TouchableOpacity
-              style={styles.collapseButton}
-              onPress={() => setIsCollapsed(true)}
+              style={dynamicStyles.collapseButton}
+              onPress={handleCollapse}
+              accessible={true}
+              accessibilityLabel="Collapse sidebar"
+              accessibilityRole="button"
             >
               <Ionicons name="chevron-back-outline" size={16} color="white" />
             </TouchableOpacity>
@@ -300,27 +410,51 @@ function CustomDrawerContent(props: any) {
         </View>
 
         {/* Main Navigation */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Main</Text>
-          {mainItems.map(renderDrawerItem)}
+        <View style={dynamicStyles.section}>
+          <Text style={dynamicStyles.sectionTitle}>Main</Text>
+          {mainItems.map(item => (
+            <DrawerItemMemo
+              key={item.route}
+              item={item}
+              isCollapsed={isCollapsed}
+              isLargeScreen={isLargeScreen}
+              colors={colors}
+              onPress={handleNavigation}
+            />
+          ))}
         </View>
 
         {/* Settings & Support */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Settings & Support</Text>
-          {settingsItems.map(renderDrawerItem)}
+        <View style={dynamicStyles.section}>
+          <Text style={dynamicStyles.sectionTitle}>Settings & Support</Text>
+          {settingsItems.map(item => (
+            <DrawerItemMemo
+              key={item.route}
+              item={item}
+              isCollapsed={isCollapsed}
+              isLargeScreen={isLargeScreen}
+              colors={colors}
+              onPress={handleNavigation}
+            />
+          ))}
         </View>
       </DrawerContentScrollView>
 
       {/* Footer with user info */}
-      <View style={styles.footer}>
-        <TouchableOpacity style={styles.userInfo} onPress={handleSignOut}>
-          <View style={styles.avatar}>
+      <View style={dynamicStyles.footer}>
+        <TouchableOpacity 
+          style={dynamicStyles.userInfo} 
+          onPress={handleSignOut}
+          accessible={true}
+          accessibilityLabel="Sign out - John Doe"
+          accessibilityRole="button"
+        >
+          <View style={dynamicStyles.avatar}>
             <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 12 }}>JD</Text>
           </View>
-          <View style={styles.userDetails}>
-            <Text style={styles.userName}>John Doe</Text>
-            <Text style={styles.userEmail}>john@example.com</Text>
+          <View style={dynamicStyles.userDetails}>
+            <Text style={dynamicStyles.userName}>John Doe</Text>
+            <Text style={dynamicStyles.userEmail}>john@example.com</Text>
           </View>
           <Ionicons name="log-out-outline" size={16} color={colors.tabIconDefault} />
         </TouchableOpacity>
@@ -329,14 +463,36 @@ function CustomDrawerContent(props: any) {
   );
 }
 
+// Static styles that don't depend on theme or state
+const styles = StyleSheet.create({
+  drawerItem: {
+    marginVertical: 1,
+    marginHorizontal: 8,
+    borderRadius: 6,
+    ...(Platform.OS === 'web' && {
+      cursor: 'pointer',
+      transition: 'background-color 0.2s ease',
+    }),
+  },
+  collapsedDrawerItem: {
+    width: 44,
+    height: 44,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: 4,
+    marginHorizontal: 8,
+    ...(Platform.OS === 'web' && {
+      cursor: 'pointer',
+      transition: 'background-color 0.2s ease',
+    }),
+  },
+});
+
 export default function DrawerLayout() {
-  const { width } = useWindowDimensions();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
-  
-  // Responsive breakpoints
-  const isLargeScreen = width >= 1024;
-  const isMediumScreen = width >= 768;
+  const { isLargeScreen, isMediumScreen } = useResponsive();
   
   // Sidebar state management - start collapsed on desktop, expanded on mobile
   const [isCollapsed, setIsCollapsed] = useState(true);
@@ -350,30 +506,41 @@ export default function DrawerLayout() {
     }
   }, [isLargeScreen]);
 
-  // Dynamic drawer configuration
-  const drawerType = isLargeScreen ? 'permanent' : 'front';
-  
-  const getDrawerWidth = () => {
-    if (isLargeScreen) {
-      return isCollapsed ? 60 : 240;
-    }
-    return isMediumScreen ? 280 : '80%';
-  };
-  
-  const swipeEnabled = !isLargeScreen;
+  // Memoized drawer configuration
+  const drawerConfig = useMemo(() => {
+    const drawerType = isLargeScreen ? 'permanent' : 'front';
+    
+    const getDrawerWidth = () => {
+      if (isLargeScreen) {
+        return isCollapsed ? 60 : 240;
+      }
+      return isMediumScreen ? 280 : '80%';
+    };
+    
+    return {
+      drawerType,
+      drawerWidth: getDrawerWidth(),
+      swipeEnabled: !isLargeScreen,
+    };
+  }, [isLargeScreen, isMediumScreen, isCollapsed]);
+
+  // Memoized context value
+  const contextValue = useMemo(() => ({
+    isCollapsed,
+    setIsCollapsed,
+    isLargeScreen,
+  }), [isCollapsed, setIsCollapsed, isLargeScreen]);
 
   return (
-    <SidebarContext.Provider value={{ isCollapsed, setIsCollapsed, isLargeScreen }}>
+    <SidebarContext.Provider value={contextValue}>
       <Drawer
         drawerContent={(props) => <CustomDrawerContent {...props} />}
         screenOptions={{
-          drawerType: drawerType,
+          drawerType: drawerConfig.drawerType,
           drawerPosition: 'left',
           drawerStyle: {
             backgroundColor: colors.background,
-            width: getDrawerWidth(),
-            borderRightWidth: 1,
-            borderRightColor: colors.tabIconDefault + '15',
+            width: drawerConfig.drawerWidth,
           },
           headerStyle: {
             backgroundColor: colors.background,
@@ -388,13 +555,11 @@ export default function DrawerLayout() {
             fontWeight: '600',
             fontSize: 18,
           },
-          // Critical fix: Hide header AND hamburger menu on large screens
-          headerShown: !isLargeScreen,
-          headerLeft: isLargeScreen ? () => null : undefined, // Hide hamburger on large screens
+          headerShown: true,
           drawerActiveTintColor: colors.tint,
           drawerInactiveTintColor: colors.tabIconDefault,
           drawerActiveBackgroundColor: colors.tint + '12',
-          swipeEnabled: swipeEnabled,
+          swipeEnabled: drawerConfig.swipeEnabled,
           drawerHideStatusBarOnOpen: Platform.OS === 'ios',
           overlayColor: 'rgba(0, 0, 0, 0.4)',
         }}
@@ -406,9 +571,6 @@ export default function DrawerLayout() {
             drawerIcon: ({ color, size }) => (
               <Ionicons name="grid-outline" size={size} color={color} />
             ),
-            // Override global settings for this specific screen if needed
-            headerShown: !isLargeScreen,
-            headerLeft: isLargeScreen ? () => null : undefined,
           }}
         />
         <Drawer.Screen
@@ -418,8 +580,6 @@ export default function DrawerLayout() {
             drawerIcon: ({ color, size }) => (
               <Ionicons name="settings-outline" size={size} color={color} />
             ),
-            headerShown: !isLargeScreen,
-            headerLeft: isLargeScreen ? () => null : undefined,
           }}
         />
         <Drawer.Screen
@@ -429,11 +589,9 @@ export default function DrawerLayout() {
             drawerIcon: ({ color, size }) => (
               <Ionicons name="help-circle-outline" size={size} color={color} />
             ),
-            headerShown: !isLargeScreen,
-            headerLeft: isLargeScreen ? () => null : undefined,
           }}
         />
       </Drawer>
     </SidebarContext.Provider>
   );
-} 
+}
