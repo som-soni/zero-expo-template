@@ -72,7 +72,7 @@ export function MainLayout({ children }: MainLayoutProps) {
         ]}
       >
         {/* Header with Menu Button */}
-        {(!isDesktop || (isDesktop && isSidebarCollapsed)) && (
+        {(!isDesktop || isSidebarCollapsed) && (
           <View style={[styles.header, { borderBottomColor: colors.border }]}>
             <TouchableOpacity 
               style={styles.menuButton} 
@@ -80,11 +80,7 @@ export function MainLayout({ children }: MainLayoutProps) {
             >
               <Ionicons name="menu" size={24} color={colors.text} />
             </TouchableOpacity>
-            {isDesktop && (
-              <Text style={[styles.headerTitle, { color: colors.text }]}>
-                Dashboard
-              </Text>
-            )}
+            
           </View>
         )}
         

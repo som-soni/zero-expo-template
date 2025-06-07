@@ -136,27 +136,28 @@ export function Sidebar({ isOpen, onClose, isCollapsed: externalIsCollapsed, onT
             backgroundColor: colors.background,
             borderRightColor: colors.border,
           },
-          !isDesktop && !isOpen && styles.hiddenSidebar,
+          // !isDesktop && !isOpen && styles.hiddenSidebar,
         ]}
       >
         {/* Header */}
         <View style={styles.header}>
-          {!isCollapsed && (
-            <Text style={[styles.appTitle, { color: colors.text }]}>
-              My App
-            </Text>
-          )}
-          {isDesktop && (
+          
+          {/* {isDesktop && ( */}
             <TouchableOpacity
               style={styles.collapseButton}
               onPress={toggleCollapse}
             >
               <Ionicons
-                name={isCollapsed ? 'menu' : 'close'}
+                name={'menu' }
                 size={20}
                 color={colors.gray500}
               />
             </TouchableOpacity>
+          {/* )} */}
+          {!isCollapsed && (
+            <Text style={[styles.appTitle, { color: colors.text }]}>
+              My App
+            </Text>
           )}
         </View>
 
@@ -206,13 +207,8 @@ export function Sidebar({ isOpen, onClose, isCollapsed: externalIsCollapsed, onT
               <Text style={[styles.userEmail, { color: colors.gray500 }]}>
                 john@example.com
               </Text>
-            </View>
-          )}
-        </View>
-
-        {/* Logout Button */}
-        <View style={styles.footer}>
-          <TouchableOpacity
+            
+              <TouchableOpacity
             style={[styles.logoutButton, isCollapsed && styles.navItemCollapsed]}
             onPress={handleLogout}
           >
@@ -221,12 +217,20 @@ export function Sidebar({ isOpen, onClose, isCollapsed: externalIsCollapsed, onT
               size={22}
               color={colors.gray500}
             />
-            {!isCollapsed && (
+            {/* {!isCollapsed && (
               <Text style={[styles.logoutText, { color: colors.gray500 }]}>
                 Logout
               </Text>
-            )}
+            )} */}
           </TouchableOpacity>
+            </View>
+            
+          )}
+        </View>
+
+        {/* Logout Button */}
+        <View style={styles.footer}>
+         
         </View>
       </View>
     </>
@@ -266,6 +270,7 @@ const styles = StyleSheet.create({
   appTitle: {
     fontSize: 18,
     fontWeight: 'bold',
+    justifyContent: 'flex-end',
   },
   collapseButton: {
     padding: 4,
@@ -331,6 +336,7 @@ const styles = StyleSheet.create({
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'flex-end',
     paddingHorizontal: 20,
     paddingVertical: 12,
     marginHorizontal: 10,
