@@ -12,6 +12,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, usePathname } from 'expo-router';
 import { useColorScheme } from '@/hooks/useColorScheme';
+
 import { Colors } from '@/lib/theme';
 import { commonStyles, sidebarStyles, spacing, layout } from '@/lib/styles';
 
@@ -37,6 +38,7 @@ export function Sidebar({ isOpen, onClose, isCollapsed: externalIsCollapsed, onT
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
   const { width } = useWindowDimensions();
+
   
   const [internalIsCollapsed, setInternalIsCollapsed] = useState(false);
   const isLargeScreen = width >= BREAKPOINT_LARGE;
@@ -80,23 +82,7 @@ export function Sidebar({ isOpen, onClose, isCollapsed: externalIsCollapsed, onT
     }
   };
 
-  const handleLogout = () => {
-    Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Logout',
-          style: 'destructive',
-          onPress: () => {
-            console.log('User logged out');
-            // Add your logout logic here
-          },
-        },
-      ]
-    );
-  };
+
 
   const toggleCollapse = () => {
     if (onToggleCollapse) {
@@ -194,45 +180,7 @@ export function Sidebar({ isOpen, onClose, isCollapsed: externalIsCollapsed, onT
           ))}
         </ScrollView>
 
-        {/* User Info with Logout - Responsive layout */}
-        {isCollapsed ? (
-          <View style={styles.collapsedUserSection}>
-            <TouchableOpacity
-              style={[sidebarStyles.avatar, { backgroundColor: colors.tint }]}
-              onPress={handleLogout}
-            >
-              <Ionicons
-                name="log-out-outline"
-                size={20}
-                color="white"
-              />
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <View style={sidebarStyles.userSection}>
-            <View style={[sidebarStyles.avatar, { backgroundColor: colors.tint }]}>
-              <Text style={styles.avatarText}>JD</Text>
-            </View>
-            <View style={styles.userInfo}>
-              <Text style={[styles.userName, { color: colors.text }]}>
-                John Doe
-              </Text>
-              <Text style={[styles.userEmail, { color: colors.gray500 }]}>
-                john@example.com
-              </Text>
-            </View>
-            <TouchableOpacity
-              style={sidebarStyles.iconButton}
-              onPress={handleLogout}
-            >
-              <Ionicons
-                name="log-out-outline"
-                size={22}
-                color={colors.gray500}
-              />
-            </TouchableOpacity>
-          </View>
-        )}
+
       </View>
     </>
   );
@@ -276,28 +224,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  collapsedUserSection: {
-    padding: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  userInfo: {
-    marginLeft: 12,
-    flex: 1,
-  },
-  userName: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  userEmail: {
-    fontSize: 12,
-    marginTop: 2,
-  },
+
   navigation: {
     flex: 1,
     paddingTop: 10,
