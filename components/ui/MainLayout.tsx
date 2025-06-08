@@ -12,6 +12,7 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 import { Colors } from '@/lib/theme';
 import { layout } from '@/lib/styles';
 import { Sidebar } from './Sidebar';
+import { AuthButton } from './AuthButton';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -71,7 +72,7 @@ export function MainLayout({ children }: MainLayoutProps) {
           },
         ]}
       >
-        {/* Header with Menu Button */}
+        {/* Header with Menu Button and Auth */}
         {(!isDesktop ) && (
           <View style={[styles.header, { borderBottomColor: colors.border }]}>
             <TouchableOpacity 
@@ -81,6 +82,16 @@ export function MainLayout({ children }: MainLayoutProps) {
               <Ionicons name="menu" size={24} color={colors.text} />
             </TouchableOpacity>
             
+            {/* Auth Button for Mobile */}
+            <AuthButton style={styles.authButton} />
+          </View>
+        )}
+
+        {/* Desktop Header with Auth */}
+        {isDesktop && (
+          <View style={[styles.desktopHeader, { borderBottomColor: colors.border }]}>
+            <View style={styles.spacer} />
+            <AuthButton style={styles.authButton} />
           </View>
         )}
         
@@ -135,5 +146,18 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     minHeight: 0, // Allow content to shrink
+  },
+  desktopHeader: {
+    height: 60,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+  },
+  spacer: {
+    flex: 1,
+  },
+  authButton: {
+    marginLeft: 'auto',
   },
 }); 
