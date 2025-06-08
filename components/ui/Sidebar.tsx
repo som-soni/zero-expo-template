@@ -7,7 +7,6 @@ import {
   ScrollView,
   useWindowDimensions,
   Platform,
-  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, usePathname } from 'expo-router';
@@ -54,6 +53,18 @@ export function Sidebar({ isOpen, onClose, isCollapsed: externalIsCollapsed, onT
       focused: pathname === '/chat',
     },
     {
+      label: 'Grid Examples',
+      icon: 'grid-outline',
+      route: '/grid-examples',
+      focused: pathname === '/grid-examples',
+    },
+    {
+      label: 'Components',
+      icon: 'library-outline',
+      route: '/component-showcase',
+      focused: pathname === '/component-showcase',
+    },
+    {
       label: 'Dashboard',
       icon: 'home-outline',
       route: '/dashboard',
@@ -80,23 +91,7 @@ export function Sidebar({ isOpen, onClose, isCollapsed: externalIsCollapsed, onT
     }
   };
 
-  const handleLogout = () => {
-    Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Logout',
-          style: 'destructive',
-          onPress: () => {
-            console.log('User logged out');
-            // Add your logout logic here
-          },
-        },
-      ]
-    );
-  };
+
 
   const toggleCollapse = () => {
     if (onToggleCollapse) {
@@ -194,45 +189,7 @@ export function Sidebar({ isOpen, onClose, isCollapsed: externalIsCollapsed, onT
           ))}
         </ScrollView>
 
-        {/* User Info with Logout - Responsive layout */}
-        {isCollapsed ? (
-          <View style={styles.collapsedUserSection}>
-            <TouchableOpacity
-              style={[sidebarStyles.avatar, { backgroundColor: colors.tint }]}
-              onPress={handleLogout}
-            >
-              <Ionicons
-                name="log-out-outline"
-                size={20}
-                color="white"
-              />
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <View style={sidebarStyles.userSection}>
-            <View style={[sidebarStyles.avatar, { backgroundColor: colors.tint }]}>
-              <Text style={styles.avatarText}>JD</Text>
-            </View>
-            <View style={styles.userInfo}>
-              <Text style={[styles.userName, { color: colors.text }]}>
-                John Doe
-              </Text>
-              <Text style={[styles.userEmail, { color: colors.gray500 }]}>
-                john@example.com
-              </Text>
-            </View>
-            <TouchableOpacity
-              style={sidebarStyles.iconButton}
-              onPress={handleLogout}
-            >
-              <Ionicons
-                name="log-out-outline"
-                size={22}
-                color={colors.gray500}
-              />
-            </TouchableOpacity>
-          </View>
-        )}
+
       </View>
     </>
   );

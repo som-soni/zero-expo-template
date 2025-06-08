@@ -154,7 +154,6 @@ export default function NewChatScreen() {
                 {
                   color: colors.text,
                   height: Math.max(40, inputHeight),
-                  borderWidth: 0, // removes unwanted internal line
                 },
               ]}
               placeholder="Type your message..."
@@ -168,9 +167,8 @@ export default function NewChatScreen() {
               textAlignVertical="top"
               blurOnSubmit={false}
               returnKeyType="send"
-              onKeyPress={({ nativeEvent }) => {
-                if (nativeEvent.key === 'Enter' && !isTyping) {
-                  // Prevent newline
+              onSubmitEditing={() => {
+                if (!isTyping && inputText.trim()) {
                   sendMessage();
                 }
               }}

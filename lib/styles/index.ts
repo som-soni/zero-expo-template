@@ -278,11 +278,15 @@ export const chatStyles = StyleSheet.create({
     lineHeight: 22,
     maxHeight: 120, // Limit max height for growth
     minHeight: 22,
-          marginRight: spacing.sm,
-      ...(Platform.OS === 'web' ? {
-        outlineWidth: 0,
-        outlineColor: 'transparent',
-      } : {}),
+    marginRight: spacing.sm,
+    borderWidth: 0,
+    backgroundColor: 'transparent',
+    ...(Platform.OS === 'web' ? {
+      outline: 'none',
+      outlineWidth: 0,
+      outlineColor: 'transparent',
+      border: 'none',
+    } : {}),
   },
   
   // Send button (now inside input wrapper)

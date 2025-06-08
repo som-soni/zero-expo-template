@@ -3,4 +3,7 @@ export * from './StyledText';
 export * from './ExternalLink';
 export * from './Sidebar';
 export * from './MainLayout';
-export * from './CenteredLayout'; 
+export * from './CenteredLayout';
+export * from './AuthButton';
+export * from './Button';
+export * from './Card'; 
