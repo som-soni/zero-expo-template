@@ -8,6 +8,7 @@ import {
   Platform,
   Alert,
 } from 'react-native';
+import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/lib/contexts/AuthContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -24,18 +25,13 @@ interface AuthButtonProps {
  * - Shows user avatar with dropdown when user is logged in
  */
 export function AuthButton({ style }: AuthButtonProps) {
-  const { user, isLoading, signInWithGoogle, signOut } = useAuth();
+  const { user, isLoading, signOut } = useAuth();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? 'light'];
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
-  const handleLogin = async () => {
-    try {
-      await signInWithGoogle();
-    } catch (error) {
-      console.error('Login error:', error);
-      Alert.alert('Login Error', 'Failed to sign in with Google. Please try again.');
-    }
+  const handleLogin = () => {
+    router.push('/login' as any);
   };
 
   const handleLogout = () => {
